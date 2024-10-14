@@ -22,7 +22,7 @@ else:
 s=socket.socket()
 
 remote = (webAddress,remotePort)
-file_name ="file1.txt"
+file_name ="poppy.txt"
 
 s.connect(remote)
 

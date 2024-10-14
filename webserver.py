@@ -1,9 +1,9 @@
 import socket
 import sys
+import mimetypes
 
 defaultServerIP = '127.0.0.1'
 defaultServerPort = 28333
-
 
 if (len(sys.argv) > 1):
     serverPort = int(sys.argv[1])
@@ -17,25 +17,29 @@ serverAddress = (serverIP,serverPort)
 s.bind(serverAddress)
 s.listen()
 
-print(f'Server is listening on {serverIP}:{serverPort}')
 
+print(f'Server is listening on {serverIP}:{serverPort}')
 
 while True:
     clientSocket, clientAddress = s.accept()
-    print(f'Connection recieved from {clientAddress[0]}:{clientAddress[1]}')
+    request_data = clientSocket.recv(1024)
+    
+    if b'\r\n\r\n' in request_data:
+        request_line = request_data.decode('ISO-8859-1').splitlines()[0]
+        method, path, protocol = request_line.split(" ")
+        mime_type, _ = mimetypes.guess_type(path)
 
-    http_response = (
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/plain\r\n"
-        "Content-Length: 23\r\n"
-        "\r\n"
-        "Bro is not the client\r\n\r\n"
-    )
-    clientSocket.sendall(http_response.encode("utf-8"))
-    clientSocket.shutdown(socket.SHUT_RDWR)  # Shutdown the connection properly
+        try:
+            with open(path[1:], "r") as fp:
+                data = fp.read()
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: {mime_type or 'text/plain'}\r\n\r\n{data}"
+        except FileNotFoundError:
+            response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n<html><body><h1>404 Not Found</h1></body></html>"
+
+        clientSocket.sendall(response.encode("ISO-8859-1"))
+
+    clientSocket.shutdown(socket.SHUT_RDWR)
     clientSocket.close()
-    # clientSocket.close()
-          
 
 
 
