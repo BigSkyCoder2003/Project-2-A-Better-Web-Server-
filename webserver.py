@@ -3,7 +3,7 @@ import sys
 import mimetypes
 
 defaultServerIP = '127.0.0.1'
-defaultServerPort = 28333
+defaultServerPort = 28330
 
 if (len(sys.argv) > 1):
     serverPort = int(sys.argv[1])
@@ -23,9 +23,9 @@ print(f'Server is listening on {serverIP}:{serverPort}')
 while True:
     clientSocket, clientAddress = s.accept()
     request_data = clientSocket.recv(1024)
-    
     if b'\r\n\r\n' in request_data:
         request_line = request_data.decode('ISO-8859-1').splitlines()[0]
+        print("Request received:\n", request_line)
         method, path, protocol = request_line.split(" ")
         mime_type, _ = mimetypes.guess_type(path)
 

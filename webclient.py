@@ -2,7 +2,7 @@ import sys
 import socket
 
 defaultWebAddress = '127.0.0.1'
-defaultRemotePort = 28333
+defaultRemotePort = 28330
 
 if (len(sys.argv)== 3) :
     webAddress = sys.argv[1]
@@ -22,7 +22,7 @@ else:
 s=socket.socket()
 
 remote = (webAddress,remotePort)
-file_name ="poppy.txt"
+file_name ="file2.html"
 
 s.connect(remote)
 
